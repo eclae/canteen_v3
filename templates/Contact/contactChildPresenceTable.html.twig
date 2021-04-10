@@ -1,0 +1,17 @@
+<table class="table table-condensed" >
+  <caption>{{ 'cantine.form.user.contacts'|trans }}</caption>
+{% for contact in entities %}
+  <tr style="text-align: right; padding-right: 10px;">
+    <td >{{ contact.displayName }}</td>
+    <td>{{ contact.parent }}</td>
+    <td>{{ contact.mobilePhoneNumber }}</td>
+    <td>{{ contact.homePhoneNumber }}</td>
+    </tr>
+
+{% endfor %}
+
+  </table>
+<script>
+    $("#myModalLabel").text("Contacts de {{ child }}");
+</script>
+

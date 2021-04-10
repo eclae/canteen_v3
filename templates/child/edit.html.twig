@@ -17,8 +17,8 @@
         </div>
         <div class="tab-pane {{ tabId == 3 ? 'active' }}" id="tab3">
 {% block contacts %}
-    {{ render(controller("App\Controller\ContactController::showContacts",{ 'childId': entity.id})) }}
-{% include 'App\Contact\contactListModalWindow.html.twig' %}
+    {{ render(controller("App\\Controller\\ContactController::showContactsAction",{ 'childId': entity.id})) }}
+{% include 'Contact/contactListModalWindow.html.twig' %}
 {% endblock %}
           </div>
         </div>

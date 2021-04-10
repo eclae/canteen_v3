@@ -1,0 +1,118 @@
+<table id="contactListTable" >
+  <caption>{{ 'cantine.form.user.contacts'|trans }}
+    <a rel="tooltip" data-placement="right" data-title="Ajouter un contact" id="addContactLink" href="{{ path('contact_new') }}" data-target="#myModal" role="button" data-toggle="modal">
+      <i class="icon-plus"></i>
+    </a>
+  </caption>
+{% for contact in entities %}
+  <tr id="{{ contact.id }}_delete_linked">
+    <td id="{{ contact.id }}" style="text-align: right; padding-right: 10px;">
+      <a rel="tooltip" data-placement="left" data-title="Editer le contact '{{ contact.displayName }}'" class="editLinkModalClass" id="{{ contact.id }}_link" href="{{ path('contact_edit',{'id': contact.id}) }}" data-target="#myModal" role="button" data-toggle="modal">
+                            {{ contact.displayName }} / {{ contact.parent }} / {{ contact.mobilePhoneNumber }} / {{ contact.homePhoneNumber }}
+        </a>
+      </td>
+      {% if contact.user.id == app.user.id %}
+      <td>
+        <a rel="tooltip" data-placement="right" data-title="Détruit le contact '{{ contact.displayName }}'" class="deleteLinkModalClass" id="{{ contact.id }}_delete_link" href="{{ path('contact_delete',{'id': contact.id}) }}">
+          <i class="icon-remove"></i>
+        </a>
+      </td>
+      {% else %}
+      <td></td>
+      {% endif %}
+             {% if not contact.hasChild(child) %}
+      <td>   <a rel="tooltip" data-placement="right" data-title="Active le contact '{{ contact.displayName }}'" class="toggleContactClass" method="UPDATE" href="{{ path('contact_activate',{'id': contact.id, 'childID': child.id}) }}">
+          <i class="icon-check"></i>
+        </a></td>
+
+
+            {% else %}
+      <td>   <a rel="tooltip" data-placement="right" data-title="Désactive le contact '{{ contact.displayName }}'" class="toggleContactClass" method="DELETE" href="{{ path('contact_deactivate',{'id': contact.id, 'childID': child.id}) }}">
+          <i class="icon-ban-circle"></i>
+        </a></td>
+
+             {% endif %}
+    </tr>
+
+{% endfor %}
+
+  </table>
+  <style  type="text/css">
+      #red {
+        text-color: red;
+      }
+    </style>
+    <script>
+      $(document).ready(function() {
+        $(function() {
+          $("#addContactLink").tooltip({
+          });
+        });
+        $(function() {
+          $(".deleteLinkModalClass").tooltip({
+          });
+        });
+        $(function() {
+          $(".toggleContactClass").tooltip({
+          });
+        });
+        $(function() {
+          $(".editLinkModalClass").tooltip({
+          });
+        });
+
+        $(".deleteLinkModalClass").click(function(e) {
+          e.preventDefault();
+          var idDeleteLink = $(this).attr('id');
+          //send the form with a JSON call
+          $.ajax({
+            url: $(this).attr('href'),
+            type: 'POST',
+            data: {'_method': 'DELETE'},
+            dataType: "json",
+            beforeSend: function() {
+              $(this).css('cursor', 'progress');
+              $("#alert").html("<div class='alert alert-info'>{{ 'cantine.calendar.flash.pending'|trans }}</div>");
+            },
+            success: function(response) {
+              // if success => hide the modal window
+              $('#' + idDeleteLink + 'ed').remove();
+            },
+            complete: function() {
+              $("#alert").load('{{ path('flash') }}');
+              $(this).css('cursor', 'pointer');
+            }
+
+          });
+          return false;
+        });
+        $(".toggleContactClass").click(function(e) {
+          e.preventDefault();
+          //var idActivateLink = $(this).attr('id');
+          //send the form with a JSON call
+          $.ajax({
+            url: $(this).attr('href'),
+            type: 'POST',
+            data: {'_method': $(this).attr('method')},
+            dataType: "json",
+            beforeSend: function() {
+              $(this).css('cursor', 'progress');
+              $("#alert").html("<div class='alert alert-info'>{{ 'cantine.calendar.flash.pending'|trans }}</div>");
+            },
+            success: function(response) {
+              $("#content").load("{{ path('admin_child_edit',{'id': child.id, 'tabId': 3}) }}");
+            },
+            error: function(response) {
+              alert(response);
+            },
+            complete: function() {
+              $("#alert").load('{{ path('flash') }}');
+              $(this).css('cursor', 'pointer');
+            }
+
+          });
+          return false;
+        });
+      });
+      </script>
+

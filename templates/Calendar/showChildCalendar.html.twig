@@ -43,7 +43,7 @@
         </thead>
         <tbody>
           <tr class="day">
-{% from "SICantineBundle:Calendar:macroSpanDay.html.twig" import span %}
+{% from "Calendar/macroSpanDay.html.twig" import span %}
 {% if firstDayOfTheMonth > 0 %}
  {% for i in 1..firstDayOfTheMonth %}
             <td><span>&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
@@ -51,7 +51,7 @@
 {% endif %}
 
 {% for class in classesSpan %}
- {% if (loop.index+firstDayOfTheMonth-1) is divisibleby(7) %}
+ {% if (loop.index+firstDayOfTheMonth-1) is divisible by(7) %}
           </tr>
           <tr class="day">
  {% endif %}
@@ -60,7 +60,7 @@
 
 {% endfor %}
 {# in order to finish the line with missing <td></td> #}
-{% if (lastDayOfTheMonth + firstDayOfTheMonth) is not divisibleby(7) %}
+{% if (lastDayOfTheMonth + firstDayOfTheMonth) is not divisible by(7) %}
             <td colspan="{{ ( 7 - (lastDayOfTheMonth+firstDayOfTheMonth) % 7) }}">&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
 {% endif %}
 
@@ -138,7 +138,7 @@
               type: 'POST',
               data: {'_method': 'UPDATE'},
               dataType: "json",
-              url: '{{ path('_welcome') }}calendar/{{ childID }}/' + day + '/{{ _month }}/{{_year }}',
+              url: '{{ path('Calendar_Home') }}calendar/{{ childID }}/' + day + '/{{ _month }}/{{_year }}',
               beforeSend: function() {
                 $("#" + day).css('cursor', 'progress');
                 $("#alert").html("<div class='alert alert-info'>{{ 'cantine.calendar.flash.pending'|trans }}</div>");

@@ -1,0 +1,120 @@
+{# Modal Window #}
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <i class="icon-remove-sign close" data-dismiss="modal" aria-hidden="true"></i>
+    <h3 id="myModalLabel">Edition du Contact</h3>
+  </div>
+  <div class="modal-body"></div>
+  <div class="modal-footer">
+    <button id="sauvegarde" class="btn btn-primary " >Sauvegarder</button>
+  </div>
+</div>
+{# /Modal Window #}
+
+<script>
+
+  $.ajaxSetup({cache: false});
+  $(document).ready(function() {
+
+    var idLink = "";
+        {# id of the 'a' link which showed the modal #}
+    var modeModal = "";
+        {# permit to distinguish edition and creation demand #}
+
+    $(".editLinkModalClass").click(function(e) {
+            {# memorize the 'id' of the 'a' link which show the modal window #}
+      idLink = $(this).attr('id');
+      modeModal = 'edit';
+      return true;
+    });
+
+    $("#addContactLink").click(function(e) {
+            {# memorize the 'id' of the 'a' link which show the modal window #}
+      modeModal = 'new';
+      return true;
+    });
+
+        {# permit to flush informations in the modal window, otherwise it was always the first informations presented #}
+    $("#myModal").on('hidden', function() {
+      $(this).removeData('modal');
+    });
+
+    $("#sauvegarde").click(function(e) {
+      e.preventDefault();
+      switch (modeModal) {
+        case 'edit':
+                    {# send the form with a JSON call #}
+          $.ajax({
+            url: $("#contactUpdate").attr('action'),
+            type: $("#contactUpdate").attr('method'),
+            data: $("#contactUpdate").serialize(),
+            dataType: "json",
+            beforeSend: function() {
+              $(this).css('cursor', 'progress');
+              $("#alert").html("<div class='alert alert-info'>{{ 'cantine.calendar.flash.pending'|trans }}</div>");
+            },
+            success: function(response) {
+                            {# if the firstName and the lastName changed => modify the displayName #}
+              if (response.error) {
+                alert(response + " alert");
+              } else {
+                $("#" + idLink).html(
+                        $("#si_cantinebundle_contacttype_firstName").val() + ' ' +
+                        $("#si_cantinebundle_contacttype_lastName").val());
+                $("#" + idLink).attr('data-original-title', "Editer le contact '" +
+                        $("#si_cantinebundle_contacttype_firstName").val() + ' ' +
+                        $("#si_cantinebundle_contacttype_lastName").val() + "'");
+                $("#" + idLink + "_delete").attr('data-original-title', "Détruit le contact '" +
+                        $("#si_cantinebundle_contacttype_firstName").val() + ' ' +
+                        $("#si_cantinebundle_contacttype_lastName").val() + "'");
+                            {# if success => hide the modal window #}
+                $('#myModal').modal('hide');
+              }
+            },
+            error: function(response) {
+          {# TODO: provide a better error management #}
+              alert(response + " alert");
+            },
+            complete: function() {
+              $("#alert").load('{{ path('flash') }}');
+              $(this).css('cursor', 'pointer');
+            }
+
+          });
+          break;
+        case 'new':
+          $.ajax({
+            url: "{{ path('admin_contact_create', {'childId': entity.id}) }}",
+            type: "POST",
+            data: $("#contactNew").serialize(),
+            dataType: "json",
+            beforeSend: function() {
+              $(this).css('cursor', 'progress');
+              $("#alert").html("<div class='alert alert-info'>{{ 'cantine.calendar.flash.pending'|trans }}</div>");
+            },
+            success: function(response) {
+              $("#content").load("{{ path('admin_child_edit',{'id': entity.id, 'tabId': 3}) }}");
+              $("#myModal").modal('hide');
+            },
+            error: function(response) {
+          {# TODO: provide a better error management #}
+              //alert(response.errorMsg + " alert");
+              alert("{{ 'cantine.contact.alert.minimumFields'|trans }}");
+            },
+            complete: function() {
+              $("#alert").load('{{ path('flash') }}');
+              $(this).css('cursor', 'pointer');
+            }
+
+          });
+          break;
+      }
+      return false;
+    });
+
+
+
+
+  });
+
+  </script>

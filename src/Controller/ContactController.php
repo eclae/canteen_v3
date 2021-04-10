@@ -8,11 +8,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\isGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use App\Entity\Contact;
 use App\Form\Type\ContactFormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
+use App\Entity\Child;
+use App\Entity\Contact;
 /**
  * Contact controller.
  *
@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class ContactController extends AbstractController {
 
-  private function getContacts(App\Entity\Child $child) {
+  private function getContacts(Child $child) {
 //TODO : increase SQL requests !!!
     //$contacts = $child->getContacts();
     $contacts = new \Doctrine\Common\Collections\ArrayCollection();
@@ -41,7 +41,7 @@ class ContactController extends AbstractController {
     return $contacts;
   }
 
-  private function hasContact(App\Entity\User $user, Contact $contact) {
+  private function hasContact(User $user, Contact $contact) {
     $answer = false;
 //TODO : increase SQL requests !!!
     //foreach ($users as $user) {
@@ -67,7 +67,7 @@ class ContactController extends AbstractController {
   public function indexAction() {
     $em = $this->getDoctrine()->getManager();
 
-    $entities = $em->getRepository('App:Contact')->findAll();
+    $entities = $em->getRepository(Contact::class)->findAll();
 
     return array(
         'entities' => $entities,
@@ -78,7 +78,7 @@ class ContactController extends AbstractController {
    *
    * @Route("/presence/child/{childId}", name="show_contacts_presence")
    * @Method("GET")
-   * @Template("App:Contact:contactChildPresenceTable.html.twig")
+   * @Template("Contact/contactChildPresenceTable.html.twig")
    */
   public function showContactsPresenceAction($childId) {
     
@@ -89,11 +89,11 @@ class ContactController extends AbstractController {
    *
    * @Route("/child/{childId}", name="show_contacts")
    * @Method("GET")
-   * @Template("App:Contact:contactChildListTable.html.twig")
+   * @Template("Contact/contactChildListTable.html.twig")
    */
   public function showContactsAction($childId) {
     $em = $this->getDoctrine()->getManager();
-    $child = $em->getRepository('App:Child')->find($childId);
+    $child = $em->getRepository(Child::class)->find($childId);
 
     return array(
         'entities' => $this->getContacts($child),
@@ -106,7 +106,7 @@ class ContactController extends AbstractController {
    *
    * @Route("/{childId}", name="admin_contact_create")
    * @Method({"POST"})
-   * @Template("App:Contact:new.html.twig")
+   * @Template("Contact/new.html.twig")
    * isGranted("ROLE_USER_ENABLED")
    */
   public function createAction(Request $request, $childId) {

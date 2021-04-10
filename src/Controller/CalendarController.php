@@ -11,7 +11,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
+use App\Entity\Child;
+use App\Entity\User;
+use App\Entity\InvoiceType;
+use App\Entity\Day;
+use App\Entity\Invoice;
+use App\Entity\ChildrenDays;
 
 /**
  * Calendar controller.
@@ -30,7 +35,7 @@ class CalendarController extends AbstractController {
         if ($today_dt < new \DateTime($today_dt->format('Y')."-06-16") or $today_dt > new \DateTime($today_dt->format('Y')."-08-15")) {
 
             $__em = $this->getDoctrine()->getManager();
-            $_allOpenedDays = $__em->getRepository('Day')->findAllOlderDays($date);
+            $_allOpenedDays = $__em->getRepository(Day::class)->findAllOlderDays($date);
             $_todayDay = current($_allOpenedDays);
             $_lastOpenedDay = clone(end($_allOpenedDays)->getDay());
             reset($_allOpenedDays);
@@ -110,16 +115,16 @@ class CalendarController extends AbstractController {
 	  setlocale(LC_TIME,"fr_FR.UTF-8");
     $em = $this->getDoctrine()->getManager();
     $user = $this->getUser();
-    $child = $em->getRepository('Child')->find($id);
+    $child = $em->getRepository(Child::class)->find($id);
     $is_invoiced = false;
-    $invoiceType_day = $em->getRepository('InvoiceType')->findByName('day');
+    $invoiceType_day = $em->getRepository(InvoiceType::class)->findByName('day');
 
-    if ($user->hasChild($child) or $user->isAdmin()) {
+    if ($user->hasChild($child) or $this->isGranted('ROLE_ADMIN')) {
 
       
       $firstDayOfMonth_dt = new \DateTime("$year-$month-01");
       //if (count($em->getRepository('Invoice')->findBy(array('date' => $firstDayOfMonth_dt, 'child' => $child))) == 1) {
-      if (count($em->getRepository('Invoice')->findBy(array('date' => $firstDayOfMonth_dt, 'type' => $invoiceType_day))) > 0) {
+      if (count($em->getRepository(Invoice::class)->findBy(array('date' => $firstDayOfMonth_dt, 'type' => $invoiceType_day))) > 0) {
         $is_invoiced = true;
       }
 
@@ -142,11 +147,11 @@ class CalendarController extends AbstractController {
       }
 
 
-      $allOpenedDays = $em->getRepository('Day')->findBy(array(), array('day' => 'ASC'));
+      $allOpenedDays = $em->getRepository(Day::class)->findBy(array(), array('day' => 'ASC'));
       foreach ($allOpenedDays as $openedDay) {
 
         if ($openedDay->getDay()->format('n') == $month and $openedDay->getDay()->format('Y') == $year) {
-          if (!$is_invoiced and ($openedDay->getDay() >= $authDay_dt or $user->isAdmin())) {
+          if (!$is_invoiced and ($openedDay->getDay() >= $authDay_dt or $this->isGranted('ROLE_ADMIN'))) {
 // CHANGE THIS THE FIRST DAY of THE YEAR
             //if (1) {
             $classesTd[$openedDay->getDay()->format('j')] = 'toggleDay';
@@ -160,7 +165,7 @@ class CalendarController extends AbstractController {
 
 
 
-      $allEatenDays = $em->getRepository('ChildrenDays')->findBy(array('child' => $id));
+      $allEatenDays = $em->getRepository(ChildrenDays::class)->findBy(array('child' => $id));
       foreach ($allEatenDays as $eatenDay) {
         if ($eatenDay->getDay()->getDay()->format('n') == $month and $eatenDay->getDay()->getDay()->format('Y') == $year) {
           if ($eatenDay->getMissing()) {
@@ -170,7 +175,7 @@ class CalendarController extends AbstractController {
           } else {
             $classesSpan[$eatenDay->getDay()->getDay()->format('j')] = 'badge rounded-pill bg-success';
           }
-          if (!$is_invoiced and ($eatenDay->getDay()->getDay() >= $authDay_dt or $user->isAdmin())) {
+          if (!$is_invoiced and ($eatenDay->getDay()->getDay() >= $authDay_dt or $this->isGranted('ROLE_ADMIN'))) {
             $classesTd[$eatenDay->getDay()->getDay()->format('j')] = 'toggleDay';
             $noOpenedDay = false;
           } else {
@@ -237,7 +242,7 @@ class CalendarController extends AbstractController {
         $classes[$i] = 'badge rounded-pill';
       }
 
-      $allOpenedDays = $em->getRepository('Day')->findAll();
+      $allOpenedDays = $em->getRepository(Day::class)->findAll();
       foreach ($allOpenedDays as $openedDay) {
 
         if ($openedDay->getDay()->format('n') == $month and $openedDay->getDay()->format('Y') == $year) {
@@ -287,7 +292,7 @@ class CalendarController extends AbstractController {
 
     $em = $this->getDoctrine()->getManager();
     $user = $this->getUser();
-    $child = $em->getRepository('Child')->find($id);
+    $child = $em->getRepository(Child::class)->find($id);
     $day_dt = new \DateTime("$day-$month-$year");
     $today_dt = new \DateTime();
     $today_dt->setTime(0, 0, 0);
@@ -299,13 +304,13 @@ class CalendarController extends AbstractController {
 
     $firstDayOfMonth_dt = new \DateTime("$year-$month-01");
      
-    if (count($em->getRepository('Invoice')->findBy(array('date' => $firstDayOfMonth_dt, 'child' => $child))) == 1) {
+    if (count($em->getRepository(Invoice::class)->findBy(array('date' => $firstDayOfMonth_dt, 'child' => $child))) == 1) {
       $is_invoiced = true;
     }
 
 //CHANGE THIS THE FIRST DAY OF THE YEAR  ____________________________________________________________________
     // if ($user->isAdmin() or ($user->hasChild($child))) { // and $day_dt >= $authDay_dt)) {
-    if (($user->isAdmin() and !$is_invoiced) or ($user->hasChild($child) and $day_dt >= $authDay_dt and !$is_invoiced)) {
+    if (($this->isGranted('ROLE_ADMIN') and !$is_invoiced) or ($user->hasChild($child) and $day_dt >= $authDay_dt and !$is_invoiced)) {
       // log action
       $childrenDaysChangeLog = new App\Entity\ChildrenDaysChangeLog();
 
@@ -314,7 +319,7 @@ class CalendarController extends AbstractController {
 
       foreach ($child->getDays() as $_day) {
         if ($_day->getDay()->getDay() == $day_dt) {
-          if ($user->isAdmin()) {
+          if ($this->isGranted('ROLE_ADMIN')) {
             if ($day_dt <= $today_dt) { //and ($_day->getMissing() == false)) {
               if ($_day->getMissing() == true) {
                 $spanClass = 'badge rounded-pill';
@@ -360,7 +365,7 @@ class CalendarController extends AbstractController {
         }
       }
 
-      if (count($openedDay = $em->getRepository('Day')->findByDay($day_dt)) == 1) {
+      if (count($openedDay = $em->getRepository(Day::class)->findByDay($day_dt)) == 1) {
         $childrenDays = new App\Entity\ChildrenDays();
         $childrenDays->setChild($child);
         $childrenDays->setDay($openedDay[0]);
@@ -369,7 +374,7 @@ class CalendarController extends AbstractController {
         $childrenDaysChangeLog->setCreation(true);
         $em->persist($childrenDaysChangeLog);
         $spanClass = 'badge rounded-pill bg-success';
-        if ($user->isAdmin() and $day_dt <= $today_dt) {
+        if ($this->isGranted('ROLE_ADMIN') and $day_dt <= $today_dt) {
           $childrenDays->setSurcharge(true);
           $spanClass = 'badge rounded-pill bg-primary';
           $childrenDaysChangeLog->setSurcharge(true);
@@ -405,7 +410,7 @@ class CalendarController extends AbstractController {
 
     $em = $this->getDoctrine()->getManager();
     $user = $this->getUser();
-    $child = $em->getRepository('Child')->find($id);
+    $child = $em->getRepository(Child::class)->find($id);
 
 
     $today_dt = new \DateTime();
@@ -417,24 +422,24 @@ class CalendarController extends AbstractController {
     
     $firstDayOfMonth_dt = new \DateTime("$year-$month-01");
     
-    if (count($em->getRepository('Invoice')->findBy(array('date' => $firstDayOfMonth_dt, 'child' => $child))) == 1) {
+    if (count($em->getRepository(Invoice::class)->findBy(array('date' => $firstDayOfMonth_dt, 'child' => $child))) == 1) {
       $is_invoiced = true;
     }
 
-    if (!$is_invoiced and ($user->hasChild($child) or $user->isAdmin())) {
+    if (!$is_invoiced and ($user->hasChild($child) or $this->isGranted('ROLE_ADMIN'))) {
       if ($lastDayOfTheMonth <= $authDay_dt) {
 //$this->get('session')->getFlashBag()->add('error', 'Demande dans le passé : impossible !');
       } else {
-        $allOpenedDays = $em->getRepository('Day')->findAll();
+        $allOpenedDays = $em->getRepository(Day::class)->findAll();
         foreach ($allOpenedDays as $openedDay) {
           if ($openedDay->getDay()->format('n') == $month and $openedDay->getDay()->format('Y') == $year) {
             if ($openedDay->getDay() >= $authDay_dt) {
-              $childrenDays = $em->getRepository('ChildrenDays')->findBy(array('child' => $child, 'day' => $openedDay));
+              $childrenDays = $em->getRepository(ChildrenDays::class)->findBy(array('child' => $child, 'day' => $openedDay));
               if (!count($childrenDays)) {
-                $childrenDays_temp = new App\Entity\ChildrenDays($child, $openedDay);
+                $childrenDays_temp = new ChildrenDays($child, $openedDay);
                 $child->addDay($childrenDays_temp);
                 // log action
-                $childrenDaysChangeLog = new App\Entity\ChildrenDaysChangeLog();
+                $childrenDaysChangeLog = new ChildrenDaysChangeLog();
                 $childrenDaysChangeLog->setChild($child);
                 $childrenDaysChangeLog->setUser($user);
                 $childrenDaysChangeLog->setCreation(true);
@@ -477,16 +482,16 @@ class CalendarController extends AbstractController {
     $day_dt = new \DateTime("$day-$month-$year");
 
 
-    if (count($openedDay = $em->getRepository('Day')->findByDay($day_dt)) == 1) {
+    if (count($openedDay = $em->getRepository(Day::class)->findByDay($day_dt)) == 1) {
 
-      if (count($children = $em->getRepository('ChildrenDays')->findByDay($openedDay))) {
+      if (count($children = $em->getRepository(ChildrenDays::class)->findByDay($openedDay))) {
         return array(
             'response' => 'badge rounded-pill bg-success',
             'day' => $day,
             'children' => $children
         );
       } else {
-        if (count($logs = $em->getRepository('ChildrenDaysChangeLog')->findByDay($openedDay))) {
+        if (count($logs = $em->getRepository(ChildrenDaysChangeLog::class)->findByDay($openedDay))) {
             foreach ($logs as $log) {
                 $em->remove($log);
             }
@@ -499,7 +504,7 @@ class CalendarController extends AbstractController {
         );
       }
     } else {
-      $newOpenedDay = new App\Entity\Day();
+      $newOpenedDay = new Day();
       $newOpenedDay->setDay($day_dt);
       $em->persist($newOpenedDay);
       $em->flush();

@@ -1,0 +1,42 @@
+<table id="contactListTable" style="width: 200px;">
+    <caption>{{ 'cantine.form.user.contacts'|trans }}&nbsp;
+        <a rel="tooltip" data-placement="right" data-title="Ajouter un contact" id="addContactLink" href="{{ path('contact_new') }}" data-target="#myModal" role="button" data-toggle="modal">
+            <i class="icon-plus-sign"></i>
+        </a>
+    </caption>
+    <tboby>
+{% for contact in form.contacts %}
+            <tr id="{{ contact.vars.id }}_delete_linked">
+                <td id="{{ contact.vars.id }}" style="text-align: right; padding-right: 10px;">
+                    <a rel="tooltip" data-placement="left" data-title="Editer le contact '{{ contact.vars.label }}'" class="editLinkModalClass" id="{{ contact.vars.id }}_link" href="{{ path('contact_edit',{'id': contact.vars.name}) }}" data-target="#myModal" role="button" data-toggle="modal">
+                            {{ contact.vars.label }}
+                        </a>
+                    </td>
+                    <td>
+                        <a rel="tooltip" data-placement="right" data-title="Détruit le contact '{{ contact.vars.label }}'" class="deleteLinkModalClass" id="{{ contact.vars.id }}_delete_link" href="{{ path('contact_delete',{'id': contact.vars.name}) }}">
+                            <i class="icon-remove-sign"></i>
+                        </a>
+                    </td>
+                </tr>
+{% endfor %}
+                </tbody>
+        </table>
+        <script>
+            $(document).ready(function() {
+                $(function() {
+                    $("#addContactLink").tooltip({
+                    });
+                });
+                $(function() {
+                    $(".deleteLinkModalClass").tooltip({
+                    });
+                });
+
+                $(function() {
+                    $(".editLinkModalClass").tooltip({
+                    });
+                });
+            });
+            </script>
+
+

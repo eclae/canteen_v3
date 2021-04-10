@@ -1,0 +1,12 @@
+<form id="contactNew" action="#" method="POST" {{ form_enctype(form) }}>
+     {{ form_widget(form) }}
+  </form>
+  <script>
+    $(document).ready(function() {
+      $(function() {
+        $("#si_cantinebundle_contacttype_email").tooltip({
+        });
+      });
+      $("#si_cantinebundle_contacttype_email").attr('data-title', "{{ 'cantine.form.contact.emailExplanations'|trans|e('js') }}");
+    });
+    </script>

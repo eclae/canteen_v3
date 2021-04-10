@@ -1,0 +1,44 @@
+<style>
+    label {
+      font-style: italic;
+    }
+    label.required {
+      font-weight: bold;
+    }
+  </style>
+  <form id="contactUpdate" action="{{ path('contact_update', { 'id': entity.id }) }}" method="post" {{ form_enctype(edit_form) }}>
+    <input type="hidden" name="_method" value="PUT" />
+        {# form_widget(edit_form) #}
+    <table>
+      <tr>
+        <td>{{ form_label(edit_form.firstName) }}</td>
+        <td>{{ form_label(edit_form.lastName) }}</td>
+      </tr>
+      <tr><td>{{ form_widget(edit_form.firstName) }}</td><td>{{ form_widget(edit_form.lastName) }}</td></tr>
+
+      <tr>
+        <td>{{ form_label(edit_form.parent) }}</td>
+        <td>{{ form_label(edit_form.email) }}</td>
+      </tr>
+      <tr><td>{{ form_widget(edit_form.parent) }}</td><td id="emailShield" rel="tooltip" data-placement="right" data-title="{{ 'cantine.form.contact.emailExplanations'|trans()  }}">{{ form_widget(edit_form.email) }}</td></tr>
+
+      <tr>
+        <td>{{ form_label(edit_form.homePhoneNumber) }}</td>
+        <td>{{ form_label(edit_form.mobilePhoneNumber) }}</td>
+      </tr>
+      <tr><td>{{ form_widget(edit_form.homePhoneNumber) }}</td><td>{{ form_widget(edit_form.mobilePhoneNumber) }}</td></tr>
+
+      <tr><td>{{ form_label(edit_form.workPhoneNumber) }}</td><td></td></tr>
+      <tr><td>{{ form_widget(edit_form.workPhoneNumber) }}</td><td></td></tr>
+
+    </table>
+  {{ form_rest(edit_form) }}
+  </form>
+  <script>
+    $(document).ready(function() {
+      $(function() {
+        $("#emailShield").tooltip({
+        });
+      });
+    });
+    </script>
