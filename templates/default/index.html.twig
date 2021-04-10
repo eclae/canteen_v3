@@ -1,0 +1,39 @@
+{% extends "base.html.twig" %}
+
+{# Dans notre layout, il faut définir le block body #}
+{% block content %}
+        {% if not is_granted('ROLE_USER_ENABLED') %}
+<h2>Votre compte n'a pas encore été validé par un administrateur</h2>
+<h3><a href="mailto:gestion@restaurant-scolaire-fleurieu-sur-saone.org?subject=Compte '{{ app.user.username }}' non activé">Vous pouvez nous contacter par mail</a></h3>
+                    {% else %}
+<!--[if IE ]>
+<p class="lead">Pour une meilleure navigation, préférer les navigateurs modernes suivants :</p>
+ <ul>
+     <li><a href="http://www.mozilla.org/fr/firefox/new/">Firefox</a></li>
+     <li><a href="http://www.google.fr/intl/fr/chrome/browser/">Chrome</a></li>
+ </ul>
+<![endif]-->
+<div class="span9">
+  <p class="alert alert-error">Les inscriptions de chaque mois M doivent être effectuées AVANT LE 15 DU MOIS M-1 directement sur le site internet.</p>
+  <p>Des modifications passées la date du 15 du mois M-1 peuvent être effectuées en tenant compte des dates limites de modification suivantes :</p>
+  <ul>
+    <li>Lundi => au plus tard le vendredi précédent à 8h00</li>
+    <li>Mardi => au plus tard le lundi précédent à 8h00</li>
+    <li>Jeudi => au plus tard le mardi précédent à 8h00</li>
+    <li>Vendredi => au plus tard jeudi précédent à 8h00</li>
+  </ul>
+  <p>La facture du mois M-1 vous sera envoyée au début du mois M par mail.</p>
+  <p class="alert alert-error">Le règlement du mois M doit être déposé dans la boîte aux lettres « Cantine » (côté maternelle) AU PLUS TARD LE 15 DU MOIS M+1.</p>
+
+  <p>Merci de regrouper les règlements : UN SEUL CHEQUE PAR FAMILLE.</p>
+  <p>Chèque à l’ordre du Restaurant scolaire de Fleurieu Sur Saône.</p>
+  <p>En cas de paiement par espèce, merci de les placer dans une enveloppe cachetée.</p>
+</div>
+                    {% endif %}
+{% if is_granted('ROLE_NO_ACCESS') %}
+
+Calendar {{ name }}
+
+ {% endif %}
+
+{% endblock content%}

@@ -1,0 +1,95 @@
+{# empty Twig template #}
+    <nav class="navbar navbar-light navbar-expand-lg" style="background-color: #e3f2fd;">
+     <div class="container-fluid">
+      <a class="navbar-brand" href="{{ path('Calendar_Home') }}">Accueil</a>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if is_granted('ROLE_PARENT') %}
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownEnfant" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Enfant  <b class="caret"></b></a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdownEnfant">
+
+                <li><a class="dropdown-item" href="{{ path('admin_child')  }}">{{ 'cantine.menu.admin.manage_children'|trans }}</a></li>
+              </ul>
+           </li>
+        {% endif %}
+        {% if is_granted('ROLE_MANAGE') %}
+           <li class="nav-item dropdown">
+             <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownMeal" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ 'cantine.menu.meal.title'|trans }} <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMeal">
+             <li><a class="dropdown-item" href="{{ path('index_meal_order') }}">{{ 'cantine.menu.meal.presence'|trans }}</a></li>
+            </ul>
+          </li>
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+          <li class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownPayment" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ 'cantine.menu.payment.title'|trans }}<b class="caret"></b></a>
+            <ul class="dropdown-menu" aria-labeledby="navbarDropdownPayment">
+                {% if ("now"|date('m') == 6) and ("now"|date('d') > 15) %}
+              <li><a class="secured_link dropdown-item" href="{# path('admin_invoice_prepare', {'month': "now"|date('m'), 'year':"now"|date('Y')})  #}">{{ 'cantine.menu.payment.prepare_invoice'|trans }}</a></li>
+              <li><a class="secured_link dropdown-item" href="{# path('admin_invoice_send', {'month': "now"|date('m'), 'year':"now"|date('Y')})  #}">{{ 'cantine.menu.payment.send_invoice'|trans }}</a></li>
+                {% else %}
+              <li><a class="secured_link dropdown-item" href="{# path('admin_invoice_prepare', {'month': date('-1month')|date('m'), 'year':date('-1month')|date('Y')})  #}">{{ 'cantine.menu.payment.prepare_invoice'|trans }}</a></li>
+              <li><a class="secured_link dropdown-item" href="{# path('admin_invoice_send', {'month': date('-1month')|date('m'), 'year':date('-1month')|date('Y')})  #}">{{ 'cantine.menu.payment.send_invoice'|trans }}</a></li>
+              {% endif %}
+              <li class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{# path('admin_payment_new')  #}">{{ 'cantine.menu.payment.new_payment'|trans }}</a></li>
+              <li><a class="dropdown-item" href="{# path('admin_payment')  #}">{{ 'cantine.menu.payment.list_payment'|trans }}</a></li>
+              <li class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{# path('admin_invoice_new_subscription')  #}">{{ 'cantine.menu.payment.subscriptions'|trans }}</a></li>
+            </ul>
+          </li>
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+          <li class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ 'cantine.menu.admin.title'|trans }}<b class="caret"></b></a>
+            <ul class="dropdown-menu" aria-labeledby="navbarDropdownAdmin">
+               <li><a class="dropdown-item" href="{# path('admin_user_new')  #}">{{ 'cantine.menu.admin.create_user'|trans }}</a></li>
+               <li><a class="dropdown-item" href="{# path('admin_user')  #}">{{ 'cantine.menu.admin.manage_users'|trans }}</a></li>
+               <li><a class="dropdown-item" href="{# path('admin_send_user_and_contact_emails')  #}">{{ 'cantine.menu.admin.email_users_contacts'|trans }}</a></li>
+               <li><a class="secured_link dropdown-item" href="{# path('send_days_2_parent') #}">{{ 'cantine.menu.admin.send_days_2_parents'|trans }}</a></li>
+              <li class="dropdown-divider"></li>
+               <li><a class="dropdown-item" href="{# path('admin_child_new')  #}">{{ 'cantine.menu.admin.create_child'|trans }}</a></li>
+               <li><a class="dropdown-item" href="{# path('admin_children_grade_show')  #}">Gestion Enfants/Classes</a></li>
+              <li class="dropdown-divider"></li>
+               <li><a class="dropdown-item" href="{# path('admin_opened_days')  #}">{{ 'cantine.menu.admin.manage_openeddays'|trans }}</a></li>
+               <li><a class="dropdown-item" href="{# path('admin_invitations')  #}">{{ 'cantine.menu.admin.manage_invitations'|trans }}</a></li>
+              <li class="dropdown-divider"></li>
+               <li><a class="dropdown-item" href="{# path('sadmin_configuration')  #}">{{ 'cantine.menu.admin.configuration'|trans }}</a></li>
+           </ul>
+         </li>
+        {% endif %}
+        {% if is_granted('ROLE_USER') %}
+         <li class="nav-item dropdown">
+           <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ 'cantine.menu.user.title'|trans  }}<b class="caret"></b></a>
+            <ul class="dropdown-menu" aria-labeledby="navbarDropdownUser">
+              <li><a class="dropdown-item" href="{# path('fos_user_profile_show')  #}">{{ 'cantine.menu.user.profile'|trans }}</a></li>
+              <li><a class="dropdown-item" href="{# path('user_balance')  #}">{{ 'cantine.menu.user.treasory'|trans }}</a></li>
+              <li><a class="dropdown-item" href="{# path('fos_user_change_password')  #}">{{ 'cantine.menu.user.change_password'|trans }}</a></li>
+              <li class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{# path('rules')  #}">{{ 'cantine.menu.user.rules'|trans }}</a></li>
+              <li class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{{ path('app_logout') }}">{{ 'cantine.logout'|trans }}</a></li>
+            </ul>
+          </li>
+        {% endif %}
+        {% if is_granted('ROLE_USER') %}
+          <li class="nav-item">
+                 <a class="nav-link navbar-brand active" aria-current="page" href="mailto:gestion@restaurant-scolaire-fleurieu-sur-saone.org"><i class="bi-envelope"></i></a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+<script>
+$(document).ready(function(){  
+ $('a.secured_link').click(function(e) {
+    //e.preventDefault();
+    if (window.confirm("{{'cantine.menu.secured_link'|trans }}")) {
+      return true;
+    } else {
+      return false;
+    }
+ })
+})
+</script>

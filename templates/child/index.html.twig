@@ -1,0 +1,15 @@
+{% set title='cantine.menu.admin.manage_children' %}
+{% set select_placeholder='cantine.title.child.list' %}
+{% set form_action=path('Calendar_Home') ~ 'child/' %}
+{% set endOfURL='/edit' %}
+{% if showEntity is null %}
+ {% set entityDefault=null %}
+ {% set controllerName="App\\Controller\\ChildController::editAction" %}
+ {% set controllerOption={'id': 0, 'tabId': 2} %}
+{% else %}
+ {% set entityDefault=showEntity.id %}
+ {% set controllerName="App\\Controller\\ChildController::editAction" %}
+ {% set controllerOption={'id': showEntity.id, 'tabId': 2} %}
+{% endif %}
+{% include 'tpl_admin_list.html.twig' %} 
+

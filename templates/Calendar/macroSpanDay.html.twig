@@ -1,0 +1,7 @@
+{% macro span(class, value) %}
+{% if class is not empty %}
+<span class="{{ class }}">{{ "%2d"|format(value)|replace({' ': '&nbsp;&nbsp;'})|raw }}</span>
+ {% else %}
+<span>&nbsp;&nbsp;{{ "%2d"|format(value)|replace({' ': '&nbsp;&nbsp;'})|raw }}</span>
+ {% endif %}
+{% endmacro %}

@@ -1,0 +1,12 @@
+{% from "SICantineBundle:Calendar:macroSpanDay.html.twig" import span %}
+{{ span(response,day) }}
+
+{% if children is defined %}
+{% set child_text = '' %}
+{% for child in children %}
+{% set child_text = child_text ~ ' ' ~ child.child.displayName ~ ',' %}
+{% endfor %}
+<script>
+alert('ce jour est utilisé par : '+ '{{ child_text }}');
+    </script>
+{% endif %}

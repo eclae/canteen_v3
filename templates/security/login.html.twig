@@ -1,0 +1,36 @@
+{% extends 'base_anonymous.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block fos_user_content %}
+<form method="post" class="form-signin">
+    {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="mb-3">
+            You are logged in as {{ 'cantine.form.user.username'|trans }}, <a href="{{ path('app_logout') }}">Logout</a>
+        </div>
+    {% endif %}
+
+    <h2 class="form-signin-heading">{{ 'cantine.form.user.signin'|trans }}</h2>
+    <input type="username" value="{{ last_username }}" name="account" id="inputAccount" class="input-block-level" required autofocus placeholder="{{ 'cantine.form.user.username'|trans }}">
+    <input type="password" name="password" id="inputPassword" class="input-block-level" required placeholder="{{ 'cantine.form.user.password'|trans }}">
+
+    <input type="hidden" name="_csrf_token"
+           value="{{ csrf_token('authenticate') }}"
+    >
+
+    
+        <div class="checkbox mb-3" align="center">
+            <label for="remember_me">
+                <input type="checkbox" id="remember_me" name="_remember_me"> {{ 'cantine.form.user.rememberme'|trans }} !
+            </label>
+        </div>
+
+    <div align="center"><button class="btn btn-large btn-primary" type="submit">
+        {{ 'cantine.form.user.signin_button'|trans }}
+    </button></div>
+</form>
+{% endblock %}

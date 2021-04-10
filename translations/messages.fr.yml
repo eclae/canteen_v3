@@ -1,0 +1,233 @@
+cantine:
+    form:
+        user:
+            firstName:            Prénom
+            lastName:             Nom
+            signin:               Identifiez-vous
+            signin_button:        Se Connecter
+            username:             Identifiant
+            password:             Mot de Passe
+            rememberme:           Rester Connecté
+            email:                EMail
+            enabled:              Compte Actif
+            children:             Enfants
+            lastlogin:            Dernière Connexion
+            locked:               Compte Bloqué
+            expired:              Compte Expiré
+            expiresat:            Expire le
+            passwordrequestedat:  Chgt de Mot de Passe demandé
+            rulesacceptedat:      Réglement Accepté le
+            roles:                Rôles
+            role:                 Rôle
+            actions:              Actions
+            profile.modify:       Modifier votre profil
+            contacts:             Liste des Contacts
+            amount:               Solde
+            delete:               Effacer l'utilisateur
+        child:
+            meal:                 Repas
+            grade:                Classe
+            ger:                  Utilisateurs
+            principalUser:        Utilisateur référent
+            firstname:            Prénom
+            lastname:             Nom
+            comment:              Commentaires, allergies, ...
+            delete:               Effacer
+            grades:
+                increment:           classe + 1
+        payment:
+            payingUser: Compte payeur
+            amount: Montant payé
+            type: Type
+            lastNameOnCheck: Nom sur le chèque
+            checkId: Numéro du chèque
+            bankName: Nom de la banque
+            comments: Commentaires
+            creationDate: Date de Création
+            delete: Effacer
+        contact:
+            firstname:            Prénom du Parent
+            lastname:             Nom du Parent
+            parent:               Parenté
+            email:                Courrier Electronique
+            homephonenumber:      Numéro fixe
+            workphonenumber:      Numéro du travail
+            mobilephonenumber:    Numéro mobile
+            emailExplanations:    L'adresse renseignée ici recevra tous les échanges concernant l'enfant, notamment les factures. Laisser vide autrement!
+        configuration:
+            title:                Modification de la configuration
+            subscription:         cotisation
+            meal_surcharge:       pénalité
+            edit:                 modifier
+        meal:
+            name:                 repas
+            day_cost:             coût par jour
+            edit:                 modifier
+    flash:
+        default: Boîte à Message
+        rightsError: Vous n'avez pas le droit de faire cette action
+    menu:
+        secured_link: Confirmez-vous cette action ?
+        user:
+            title: Utilisateur
+            profile: Mon Profil
+            change_password: Changement du mot de passe
+            information: Informations
+            rights: Droit
+            child: Enfant
+            contacts: Contacts
+            rules: Règlement
+            treasory: Balance
+            actions: Actions
+        child:
+            calendar: Gestion de vos Enfants
+        admin:
+            title: Admin
+            create_user: Créer un utilisateur
+            create_child: Créer un enfant
+            manage_users: Gestion des utilisateurs
+            manage_children: Gestion des enfants
+            manage_openeddays: Gestion des jours ouvrés
+            manage_invitations: Gestion des invitations
+            email_users_contacts: Ecrire un mail aux utilisateurs
+            send_days_2_parents: Envoyer aux parents les jours du mois suivant
+            configuration: Configuration des prix
+        payment:
+            title: Paiement
+            prepare_invoice: préparer les factures
+            send_invoice: envoyer les factures
+            new_payment: ajouter un paiement
+            list_payment: lister les paiments
+            subscriptions: Ajouter les cotisations annuelles
+        contact:
+            team: Nous Contacter
+        meal:
+            title: Repas
+            presence: Présence
+            order: Commande des Repas
+    title:
+        manage:
+            user: Gestion de l'utilisateur
+        child:
+            list: Liste des Enfants
+            create: Ajout d'un Enfant
+        childrendays:
+            index: Présence
+    user:
+        never_connected: Jamais Connecté
+        never_asked: Non Demandé
+        never_accepted: Jamais Accepté
+        treasory:
+            invoices: Factures
+            payments: Paiements
+    alert:
+        changed: Changement Effectué !
+    contact:
+        alert:
+            minimumFields: Renseigner au moins le Nom, le Prénom, la parenté et le numéro de mobile !
+        flash:
+            contactUpdated:       Contact <strong>%contactName%</strong> mis à jour!
+            contactCreated:       Contact <strong>%contactName%</strong> créé!
+            contactDeleted:       Contact <strong>%contactName%</strong> effacé!
+            contactCreationError: Erreur dans la création du contact!
+            contactActivated:     Contact <strong>%contactName%</strong> activé
+            contactDeactivated:   Contact <strong>%contactName%</strong> désactivé
+            deleteForbidden:      Effacement interdit - ce contact ne vous appartient pas !
+    calendar:
+        dayname:
+            short:
+                mon: lun
+                tue: mar
+                wed: mer
+                thu: jeu
+                fri: ven
+                sat: sam
+                sun: dim
+            long:
+                mon: lundi
+                tue: mardi
+                wed: mercredi
+                thu: jeudi
+                fri: vendredi
+                sat: samedi
+                sun: dimanche
+        monthname:
+            long:
+                jan: janvier
+                feb: février
+                mar: mars
+                apr: avril
+                may: mai
+                jun: juin
+                jul: juillet
+                aug: août
+                sep: septembre
+                oct: octobre
+                nov: novembre
+                dec: décembre
+        flash:
+            update: Modification prise en compte
+            updates: Modifications prisent en comptes
+            pending: Modifications en cours
+            error: Une erreur s'est produite
+            noMoreSelectableDay: Aucun jour activable de plus !
+            selectAllDays: Selection de tous les jours
+    registration:
+        documentation: aide
+    child:
+        menu:
+            profile: Profil
+            calendar: Calendrier
+            contacts: Contacts
+        delete:
+            confirm: Voulez-vous vraiment effacer l`enfant %childname%
+        flash:
+            profileUpdated:     Profil de l'enfant mis à jour !
+            profileUpdateError: Erreur lors de la mise à jour du Profil !
+    childrendays:
+        flash:
+            pending: Patientez SVP !
+            removechild: va être retiré de la liste !
+            addchild: va être ajouté à la liste !
+            presence:
+                date: Présence du %date%
+            registered:
+                child:
+                    already: Enfant déjà enregistré ce jour
+                day:
+                    notopen: La cantine n`est pas assurée le %date%
+            child:
+                remove:
+                    before:
+                        now: Impossible pour une date postérieur à aujourd'hui!
+        child:
+            delete:
+                confirm: Voulez-vous retirer de la liste du jour l`enfant
+            add:
+                confirm: Voulez-vous ajouter à la liste du jour l`enfant
+    action:
+        show: Afficher
+        edit: Modifier
+        delete: Supprimer
+        new:
+            user: Nouvel Utilisateur
+            child: Ajouter Enfant
+    invoicetype:
+        subscription: Cotisation
+        day: Jour
+        penalty: jour surtaxé
+        invitation: invitation
+    paymenttype:
+        cash: Liquide
+        check: Chèque
+    logout: Se Déconnecter
+
+resetting:
+    password_already_requested: Un nouveau mot de passe a déjà été demandé pour cet utilisateur dans les dernières 24 heures. Vérifier votre boite email.
+
+title:
+    user:
+        list: utilisateurs
+
+
+

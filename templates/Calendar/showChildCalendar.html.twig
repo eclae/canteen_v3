@@ -1,0 +1,193 @@
+{% block calendar %}
+<div id="calendar">
+  <style>
+    .toggleDay {
+      cursor: pointer;
+    }
+    .badge-success-passed {
+      background-color: #79B079;
+    }
+    .badge-important-passed {
+      background-color: #E66866;
+    }
+    .badge-passed {
+      background-color: #CCCCCC;
+    }
+    .badge-info-passed {
+      background-color: #6668E6;
+    }
+  </style>
+  <div class="row">
+    <div class="span3">
+      <table class="table table-condensed" style="text-align: center;">
+        <thead>
+          <tr><th colspan="7"><center>{{ childName }}</center></th></tr>
+        <tr>
+          <th>
+            <a class="getCalendar" href="{{ path('show_child_calendar',{'id': childID, 'month': previousMonthYear|date('m'), 'year': previousMonthYear|date('Y')}) }}">
+              <i class="icon-arrow-left"></i>
+            </a>
+          </th>
+          <th colspan="5"><center>{{ actualMonthYear|title }}</center></th>
+        <th>
+          <a class="getCalendar" href="{{ path('show_child_calendar',{'id': childID, 'month': nextMonthYear|date('m'), 'year': nextMonthYear|date('Y')}) }}">
+            <i class="icon-arrow-right"></i>
+          </a>
+        </th>
+        </tr>
+        <tr class='day-name'>
+                {% for day in weekDayName %}
+          <th>{{ day|trans|title }}</th>
+                    {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+          <tr class="day">
+{% from "SICantineBundle:Calendar:macroSpanDay.html.twig" import span %}
+{% if firstDayOfTheMonth > 0 %}
+ {% for i in 1..firstDayOfTheMonth %}
+            <td><span>&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+ {% endfor %}
+{% endif %}
+
+{% for class in classesSpan %}
+ {% if (loop.index+firstDayOfTheMonth-1) is divisibleby(7) %}
+          </tr>
+          <tr class="day">
+ {% endif %}
+
+            <td id="{{ loop.index }}" class="{{ classesTd[loop.index] }}">{{ span(class, loop.index) }}</td>
+
+{% endfor %}
+{# in order to finish the line with missing <td></td> #}
+{% if (lastDayOfTheMonth + firstDayOfTheMonth) is not divisibleby(7) %}
+            <td colspan="{{ ( 7 - (lastDayOfTheMonth+firstDayOfTheMonth) % 7) }}">&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+{% endif %}
+
+{# in order to always have 6 lines #}
+{% if ((firstDayOfTheMonth + lastDayOfTheMonth) / 7 ) <= 5 %}
+          <tr><td colspan="7">&nbsp;</td></tr>
+                  {% endif %}
+
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan=7" style="text-align: center;">
+                      {% if inTheFutur and noOpenedDay == false %}
+              <a id="eatAllDays" href="{{ path('toggle_child_days',{'id': childID, 'month': _month, 'year': _year}) }}" class="btn btn-inverse btn-small">
+                          {{ 'cantine.calendar.flash.selectAllDays'|trans }}
+              </a>
+                      {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <script>
+        $(document).ready(function() {
+          $.ajaxSetup({cache: false});
+          $("a.getCalendar").click(function(e) {
+            e.preventDefault();
+            var id = $(this).attr('id');
+            $.ajax({
+              type: 'GET',
+              url: $(this).attr('href'),
+              beforeSend: function() {
+                $("#" + id).css('cursor', 'progress');
+                $("#alert").load('{{ path('flashDefault') }}');
+              },
+              success: function(response) {
+                $("#calendar").html(response);
+              },
+              error: function(response, error) {
+                alert(error);
+              },
+              complete: function() {
+                $("#" + id).css('cursor', 'pointer');
+              }
+            });
+            return false;
+          });
+          $("a#eatAllDays").click(function(e) {
+            e.preventDefault();
+            $.ajax({
+              type: 'POST',
+              url: $(this).attr('href'),
+              data: {'_method': 'UPDATE'},
+              beforeSend: function() {
+                $("a#eatAllDays").css('cursor', 'progress');
+                $("#alert").html("<div class='alert alert-info'>{{ 'cantine.calendar.flash.pending'|trans }}</div>");
+              },
+              success: function(response) {
+                $("#calendar").html(response);
+                $("#alert").load('{{ path('flash') }}');
+              },
+              error: function() {
+                $("#alert").html("<div class='alert alert-error'>{{ 'cantine.calendar.flash.error'|trans }}</div>");
+              },
+              complete: function() {
+                $("a#eatAllDays").css('cursor', 'pointer');
+              }
+            });
+            return false;
+          });
+          $("td.toggleDay").click(function(e) {
+            e.preventDefault();
+            var day = $(this).attr('id');
+            $.ajax({
+              type: 'POST',
+              data: {'_method': 'UPDATE'},
+              dataType: "json",
+              url: '{{ path('_welcome') }}calendar/{{ childID }}/' + day + '/{{ _month }}/{{_year }}',
+              beforeSend: function() {
+                $("#" + day).css('cursor', 'progress');
+                $("#alert").html("<div class='alert alert-info'>{{ 'cantine.calendar.flash.pending'|trans }}</div>");
+              },
+              success: function(response) {
+                $("#" + day).html(response.span);
+
+                $("#alert").html("<div class='alert alert-success'>{{ 'cantine.calendar.flash.update'|trans }}</div>");
+              },
+              error: function() {
+                $("#alert").html("<div class='alert alert-error'>{{ 'cantine.calendar.flash.error'|trans }}</div>");
+
+              },
+              complete: function() {
+                $("#" + day).css('cursor', 'pointer');
+              }
+            });
+            return false;
+          });
+        });
+      </script>
+
+    </div><div class="span3 offset1">
+      <table>
+        <caption><b>Légende</b></caption>
+        <tbody class="text-left">
+            <tr valign="top"><td><table>
+          <tr><td><span class="badge badge-success">va manger</span></td></tr>
+	<tr><td><span class="badge badge">peut manger</span></td></tr>
+          	{% if is_granted('ROLE_ADMIN') %}
+          <tr><td><span class="badge badge-important">devait manger</span></td></tr>
+	  <tr><td><span class="badge badge-info">ne devait pas manger</span></td></tr>
+		{% else %}
+          <tr><td> </td></tr>
+          <tr><td> </td></tr>
+                {% endif %}
+          </table></td>
+            <td><table>
+          <tr><td><span class="badge badge-success-passed">a mangé</span></td></tr>
+          <tr><td><span class="badge badge-passed">pouvait manger</span></td></tr>
+          <tr><td><span class="badge badge-important-passed">devait manger</span></td></tr>
+          <tr><td><span class="badge badge-info-passed">ne devait pas manger</span></td></tr>
+          </table></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock calendar %}
+
+
+

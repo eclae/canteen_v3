@@ -1,0 +1,141 @@
+﻿<div class="container-fluid">
+  <div class="row">
+  <div class="col-sm-1">
+  </div>
+  <div class="col-sm-6">
+    <style type="text/css">
+      .badge {
+          border-radius: 10px;
+      }
+    </style>
+    <table class="table table-sm" style="text-align: center;">
+      <thead>
+        <tr>
+          <th>
+            <a class="getCalendar" href="{{ path('show_meal_order',{'month': previousMonthYear|date('m'), 'year': previousMonthYear|date('Y')}) }}">
+              <i class="bi-arrow-left-square"></i>
+            </a>
+          </th>
+          <th colspan="5"><center>{{ actualMonthYear|title }}</center></th>
+          <th>
+            <a class="getCalendar" href="{{ path('show_meal_order',{'month': nextMonthYear|date('m'), 'year': nextMonthYear|date('Y')}) }}">
+              <i class="bi-arrow-right-square"></i>
+            </a>
+          </th>
+        </tr>
+      {# week day name line #}
+        <tr class='day-name'>
+          {% for day in weekDayName %}
+            <th><center>{{ day|trans|title }}<center></th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+     {# day lines #}
+        <tr class="day">
+        {% from "ChildrenDays/macroSpanDay.html.twig" import span %}
+        {% from "ChildrenDays/macroSpanMealCounter.html.twig" import span_counter %}
+        {# beginning by blind day until the first of the month #}
+        {% if firstDayOfTheMonth > 0 %}
+         {% for i in 1..firstDayOfTheMonth %}
+            <td>&nbsp;</td>
+         {% endfor %}
+        {% endif %}
+        {# cantine day #}
+        {% for class in classes %}
+         {% if (loop.index+firstDayOfTheMonth-1) is divisible by(7) %}
+          </tr>
+          <tr class="day">
+         {% endif %}
+          {% if class is not empty %}
+            <td class="well day bg-light bg-gradient" id="{{ loop.index }}" style="cursor: pointer;">
+              <center>{{ span(class, loop.index) }}<br />
+                  <span class="badge bg-dark">
+                 {{ span_counter(normalMealNumber[loop.index], withoutMeatMealNumber[loop.index], withoutPorkMealNumber[loop.index], adultMealNumber[loop.index]) }} 
+                  </span>
+              </center>
+            </td>
+          {% else %}
+            <td><center>{{ span(class, loop.index) }}</center></td>
+          {% endif %}
+        {% endfor %}
+        {# in order to finish the line with missing <td></td> #}
+        {% if (lastDayOfTheMonth + firstDayOfTheMonth) is not divisible by (7) %}
+            <td colspan="{{ ( 7 - (lastDayOfTheMonth+firstDayOfTheMonth) % 7) }}">&nbsp;</td></tr>
+        {% endif %}
+
+        {# in order to always have 6 lines #}
+        {% if ((firstDayOfTheMonth + lastDayOfTheMonth) / 7 ) <= 5 %}
+           <tr><td colspan="7">&nbsp;</td></tr>
+        {% endif %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="7">
+          <div class="well span2">
+            <span class="badge rounded-pill bg-primary">Repas normal</span>
+            <span class="badge rounded-pill bg-danger">Repas sans viande</span>
+            <span class="badge rounded-pill bg-success">Repas sans porc</span>
+            <span class="badge rounded-pill bg-secondary">Repas adulte</span>
+            <span class="badge rounded-pill bg-warning">PAI</span>
+          </div>
+         </th>
+        </tr>
+      </tfoot>
+    </table>
+
+    <script>
+      $(document).ready(function() {
+        $("a.getCalendar").click(function(e) {
+          e.preventDefault();
+          $(this).css('cursor', 'wait');
+          $.ajax({type: 'GET',
+            cache: false,
+            url: $(this).attr('href'),
+            success: function(response) {
+              $("#calendar").html(response);
+              $(this).css('cursor', 'pointer');
+            },
+            error: function(response, error) {
+              alert(error);
+            }
+          });
+          return false;
+        });
+
+      });
+      </script>
+      
+       <script>
+            $(document).ready(function() {
+              $("td.day").click(function(e) {
+                e.preventDefault();
+                $.ajax({
+                  cache: false,
+                  type: 'GET',
+                  url: "{{ path('Calendar_Home') }}childrendays/index_presence/"+$(this).attr('id')+"/{{ _month }}/{{ _year }}",
+                  beforeSend: function() {
+                      $(this).css('cursor', 'progress');
+                      $("#alertBox").html("<div class='alert alert-info' role='alert'>{{ 'cantine.childrendays.flash.pending'|trans }}</div>");
+                  },
+                  success: function(response) {
+                    $("#childrenList").html(response);
+                    $("#alertBox").load('{{ path('flash') }}');
+                  },
+                  error: function(response, error) {
+                    alert(error);
+                  },
+                  complete: function() {
+                      $(this).css('cursor', 'pointer');
+                  }
+                });
+                return false;
+              });
+
+            });
+            </script>
+   </div>
+  </div>
+</div>
+
+

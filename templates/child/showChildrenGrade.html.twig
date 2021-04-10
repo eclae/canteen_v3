@@ -1,0 +1,78 @@
+{% extends 'base..html.twig' %}
+
+{% block stylesheets %}
+<link href="{{ asset('css/jquery-plugin/jquery-ui-timepicker-addon.css') }}" rel="stylesheet" media="screen" />
+ {% block CSS_addon %}
+ {% endblock %}
+{% endblock stylesheets %}
+{% block javascripts %}
+<script src="{{ asset('js/jquery-plugin/ui/minified/jquery.ui.datepicker.min.js') }}"></script>
+<script src="{{ asset('js/jquery-plugin/ui/i18n/jquery-ui-i18n.js') }}"></script>
+<script src="{{ asset('js/jquery-plugin/jquery-ui-timepicker-addon.js') }}"></script>
+<script src="{{ asset('js/jquery-plugin/jquery-ui-sliderAccess.js') }}"></script>
+ {% block JS_addon %}
+ {% endblock %}
+{% endblock javascripts %}
+
+{%- block centerTitle -%}
+<p align="center" style="font-size: x-large"><b>Gestion de la classe des enfants</b></hp>
+{% endblock %}
+
+{% block content %}
+<div class="tabbable tabs-left ">
+  <ul class="nav nav-tabs">
+   {% for grade in grades %}
+    <li class="navLines {% if page == loop.index %}active{% endif %}" data-toggle="tooltip" data-placement="left" data-title="{{ grade.name }}"><a href="#tab{{loop.index}}" data-toggle="tab">{{ grade.name }}</a></li>
+   {% endfor %}
+   </ul>
+	<div>{{ higest_grade.id }}</div>
+   <div class="tab-content">
+   {% for grade in grades %}
+    <div class="tab-pane {% if page == loop.index %}active{% endif %}" id="tab{{loop.index}}">
+   
+        <table>
+            <tbody>
+                <tr><th>Nom</th><th>Prénom</th><th>Classe</th><th></th><th></th></tr>
+                {% for child in children if child.grade == grade %}
+                    <tr>
+                        <td>{{ child.lastname }}</td>
+                        <td>{{ child.firstname }}</td>
+                        <td>{{ child.grade }}</td>
+                       <td>{% if child.grade.id < highest_grade.id %}{{ form(forms_childgrades[child.id]) }}{% endif %}</td>
+                        <td>{{ form(forms_children[child.id]) }}</td>
+                    </tr>    
+                {% endfor %}
+            </tbody>
+        </table>
+    
+    {# include 'SICantineBundle:Child:editChildProfil.html.twig' #}
+    </div>
+   {% endfor %}
+    
+ {#   
+      <div class="tab-pane {{ tabId == 2 ? 'active' }}" id="tab2">
+{% block calendar %}
+    {{ render controller("SICantineBundle:Calendar:showChildCalendar",{ 'id': entity.id, 'month': "now"|date('m'), 'year': "now"|date('Y') }) }}
+{% endblock %}
+        </div>
+        <div class="tab-pane {{ tabId == 3 ? 'active' }}" id="tab3">
+{% block contacts %}
+    {{ render controller("SICantineBundle:Contact:showContacts",{ 'childId': entity.id}) }}
+{% include 'SICantineBundle:Contact:contactListModalWindow.html.twig' %}
+{% endblock %}
+          </div>
+#}
+   </div>
+</div>
+
+      <script>
+        $(".navLines").click(function() {
+          return true;
+        });
+        $(function() {
+          $(".navLines").tooltip({
+          });
+        });
+        </script>
+
+{% endblock %}

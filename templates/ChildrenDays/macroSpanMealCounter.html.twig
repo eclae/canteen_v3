@@ -1,0 +1,9 @@
+{% macro span_counter(normalMealNumber, withoutMeatMealNumber, withoutPorkMealNumber, adultMealNumber) %}
+
+ <span class="text-primary">{% if normalMealNumber is defined %}{{ normalMealNumber }}{% endif %}</span>
+ <span class="text-danger">{% if withoutMeatMealNumber is defined %}{{ withoutMeatMealNumber }}{% endif %}</span>
+ <BR />
+ <span class="text-success">{% if withoutPorkMealNumber is defined %}{{ withoutPorkMealNumber }}{% endif %}</span>
+ <span class="text-secondary">{% if adultMealNumber is defined %}{{ adultMealNumber }}{% endif %}</span>
+ 
+{% endmacro %}

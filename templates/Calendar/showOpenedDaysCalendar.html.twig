@@ -1,0 +1,122 @@
+<style>
+    .toggleDay {
+      cursor: pointer;
+    }
+  </style>
+  <div  class="span3">
+
+    <table class="table table-condensed" style="text-align: center;">
+      <thead>
+        <tr>
+          <th>
+            <a class="getCalendar" href="{{ path('admin_opened_days_calendar',{'month': previousMonthYear|date('m'), 'year': previousMonthYear|date('Y')}) }}">
+              <i class="icon-arrow-left"></i>
+            </a>
+          </th>
+          <th colspan="5"><center>{{ actualMonthYear|title }}</center></th>
+      <th>
+        <a class="getCalendar" href="{{ path('admin_opened_days_calendar',{'month': nextMonthYear|date('m'), 'year': nextMonthYear|date('Y')}) }}">
+          <i class="icon-arrow-right"></i>
+        </a>
+      </th>
+      </tr>
+      <tr class='day-name'>
+                {% for day in weekDayName %}
+          <th>{{ day|trans|title }}</th>
+                    {% endfor %}
+          </tr>
+          </thead>
+          <tbody>
+            <tr class="day">
+{% from "SICantineBundle:Calendar:macroSpanDay.html.twig" import span %}
+{% if firstDayOfTheMonth > 0 %}
+ {% for i in 1..firstDayOfTheMonth %}
+                <td>&nbsp;</td>
+ {% endfor %}
+{% endif %}
+
+{% for class in classes %}
+ {% if (loop.index+firstDayOfTheMonth-1) is divisibleby(7) %}
+              </tr>
+              <tr class="day">
+ {% endif %}
+  {% if class is not empty %}
+                  <td id="{{ loop.index }}" class="toggleDay">{{ span(class, loop.index) }}</td>
+  {% else %}
+                  <td>{{ span(class, loop.index) }}</span></td>
+  {% endif %}
+{% endfor %}
+{# in order to finish the line with missing <td></td> #}
+{% if (lastDayOfTheMonth + firstDayOfTheMonth) is not divisibleby(7) %}
+                  <td colspan="{{ ( 7 - (lastDayOfTheMonth+firstDayOfTheMonth) % 7) }}">&nbsp;</td></tr>
+{% endif %}
+
+{# in order to always have 6 lines #}
+{% if ((firstDayOfTheMonth + lastDayOfTheMonth) / 7 ) <= 5 %}
+                <tr><td colspan="7">&nbsp;</td></tr>
+                  {% endif %}
+
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="7" id="alert"></th>
+                </tr>
+              </tfoot>
+            </table>
+
+            <script>
+              $(document).ready(function() {
+                $.ajaxSetup({cache: false});
+                $("a.getCalendar").click(function(e) {
+                  e.preventDefault();
+                  $(this).css('cursor', 'wait');
+                  $.ajax({type: 'GET',
+                    url: $(this).attr('href'),
+                    success: function(response) {
+                      $("#calendar").html(response);
+                      $(this).css('cursor', 'auto');
+                    },
+                    error: function(response, error) {
+                      alert(error);
+                    }
+                  });
+                  //return false;
+                });
+
+              });
+              </script>
+              <script>
+                $(document).ready(function() {
+
+                  $.ajaxSetup({cache: false});
+                  $("td.toggleDay").click(function(e) {
+                    e.preventDefault();
+                    $(this).css('cursor', 'progress');
+                    $("#alert").html("<div class='alert alert-info'>Modification en cours</div>");
+                    var day = $(this).attr('id');
+                    var URL = '{{ path('_welcome') }}calendar/admin/openedDays/' + day + '/{{ _month }}/{{_year }}';
+                    var error = '';
+                    $.ajax({
+                      type: 'POST',
+                      data: {'_method': 'UPDATE'},
+                      url: URL,
+                      success: function(response) {
+                        $("#" + day).html(response);
+                        $("#alert").html("<div class='alert alert-success'>Modification prise en compte</div>");
+                        $("#" + day).css('cursor', 'pointer');
+                      },
+                      error: function(response, error) {
+                        $("#alert").html("<div class='alert alert-error'>une erreur s'est produite</div><div>"+ error +"</div>");
+                        $("#" + day).css('cursor', 'pointer');
+                      }
+                    });
+                    //return false;
+
+                  });
+                });
+                </script>
+
+              </div>
+
+
+

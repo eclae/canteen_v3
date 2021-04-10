@@ -1,0 +1,36 @@
+<div class="tabbable tabs-left ">
+  <ul class="nav nav-tabs">
+    <li class="navLines {{ tabId==1 ? 'active' }}" data-toggle="tooltip" data-placement="left" data-title="{{ 'cantine.child.menu.profile'|trans }}"><a href="#tab1" data-toggle="tab"><i class="icon-user"></i></a></li>
+    <li class="navLines {{ tabId==2 ? 'active' }}" data-toggle="tooltip" data-placement="left" data-title="{{ 'cantine.child.menu.calendar'|trans }}"><a href="#tab2" data-toggle="tab"><i class="icon-calendar"></i></a></li>
+    <li class="navLines {{ tabId==3 ? 'active' }}" data-toggle="tooltip" data-placement="left" data-title="{{ 'cantine.child.menu.contacts'|trans }}"><a href="#tab3" data-toggle="tab"><i class="icon-envelope"></i></a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane {{ tabId == 1 ? 'active' }}" id="tab1">
+            {% block childProfil %}
+    {% include 'child/editChildProfil.html.twig' %}
+{% endblock %}
+      </div>
+      <div class="tab-pane {{ tabId == 2 ? 'active' }}" id="tab2">
+{% block calendar %}
+    {{ render(controller("App\\Controller\\CalendarController::showChildCalendarAction",{ 'id': entity.id, 'month': "now"|date('m'), 'year': "now"|date('Y') })) }}
+{% endblock %}
+        </div>
+        <div class="tab-pane {{ tabId == 3 ? 'active' }}" id="tab3">
+{% block contacts %}
+    {{ render(controller("App\Controller\ContactController::showContacts",{ 'childId': entity.id})) }}
+{% include 'App\Contact\contactListModalWindow.html.twig' %}
+{% endblock %}
+          </div>
+        </div>
+      </div>
+
+      <script>
+        $(".navLines").click(function() {
+          $("#alert").load('{{ path('flashDefault') }}');
+          return true;
+        });
+        $(function() {
+          $(".navLines").tooltip({
+          });
+        });
+        </script>

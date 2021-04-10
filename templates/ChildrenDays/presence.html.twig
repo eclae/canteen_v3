@@ -1,0 +1,152 @@
+﻿<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-1">
+    </div>
+    <div  class="col-sm-6">
+      <div class="d-flex align-items-start">
+      <ul class="nav nav-tabs flex-column me-3" id="myTab" role="tablist">
+          {% for grade in grades %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link {% if tabId == loop.index %}active{% endif %}" id="home-tab" data-bs-toggle="tab" data-bs-target="#tab{{loop.index}}" type="button" role="tab" aria-controls="tab{{loop.index}}" aria-selected="{% if tabId == loop.index %}true{% else %}false{% endif %}">{{ grade }} ({{ childByGrade[loop.index]|length }})</button>
+            </li>
+          {% endfor %}
+          {% if is_granted('ROLE_ADMIN') %}
+            <li>
+              <form action='#' method='GET'>
+                <select id="children_list"  style="width: 120px;">
+                  <option><option>
+              {% for child in childrenNotRegisteredThatDay %}
+                  <option value="{{ child.id }}" grade="{{ child.grade.id }}">{{ child.displayName }}</option>
+              {% endfor %}
+                </select>
+              </form>
+            </li>
+          {% endif %}
+        <li><a target="_blank" href="{{ path('index_presence_printable',{'day': date|date('d'), 'month': date|date('m'), 'year': date|date('Y') }) }}">Imprimer</a></li>
+      </ul>
+
+      <div class="tab-content" id="myTabContent">
+         {% for grade in grades %}
+        <div class="tab-pane fade {% if tabId == loop.index %}active show{% endif %}" id="tab{{loop.index}}" role="tabpanel" aria-labelledby="tab{{loop.index}}">
+          <table class="table table-sm" style="text-align: center; text-valign: top;">
+            <tbody><tr><td>
+            {% for CH in childByGrade[loop.index] %}
+                  <p class="childName" rel="tooltip" data-placement="top"
+                     data-title="{{ CH.child }} / {{ CH.child.meal.name }} / {{ CH.child.comment }}">
+                      {% if is_granted('ROLE_ADMIN') %}<i class="bi-x-circle icon-remove-child" grade="{{ CH.child.grade.id }}" childId="{{ CH.id }}"></i>&nbsp;{% endif %}
+                    <a href="{# path('show_contacts_presence',{'childId': CH.child.id}) #}" data-target="#myModal" role="button" data-toggle="modal">
+                      <span class="text {{ badgeByMeal[CH.child.meal.id] }}">{{ CH.child }}</span>
+                    </a>
+                  </p>
+            {% if (loop.index) is divisible by(14) %}</td><td>{% endif %}
+            {% endfor %}
+
+
+                </td></tr></tbody>
+          </table>
+        </div>
+         {% endfor %}
+
+      </div>
+
+    </div>
+    {# Modal Window #}
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <i class="icon-remove-sign close" data-dismiss="modal" aria-hidden="true"></i>
+        <h3 id="myModalLabel">Contacts</h3>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+      </div>
+    </div>
+    {# /Modal Window #}
+    <script>
+    {# permit to flush informations in the modal window, otherwise it was always the first informations presented #}
+      $("#myModal").on('hidden', function() {
+        $(this).removeData('modal');
+      });
+    </script>
+    <script>
+      $(document).ready(function($) {
+        $(function() {
+          $(".childName").tooltip({
+          });
+        });
+      });
+    </script>
+    <script>
+      $(document).ready(function() {
+        $(".icon-remove-child").click(function(e) {
+          e.preventDefault();
+          var childname = $(this).next().text();
+          var tabId = $(this).attr('grade');
+          if (window.confirm("{{ 'cantine.childrendays.child.delete.confirm'|trans }} " + childname + "({{ date|date('d/m/Y') }})")) {
+            $.ajax({
+              type: 'GET',
+              cache: false,
+              url: "{{ path('Calendar_Home') }}childrendays/remove_child/" + $(this).attr('childId') + "/{{ date|date('d') }}/{{ date|date('m') }}/{{ date|date('Y') }}/" + tabId,
+              beforeSend: function() {
+                $(this).css('cursor', 'progress');
+                $("#alertBox").html("<div class='alert alert-info'>" + childname + " {{ 'cantine.childrendays.flash.removechild'|trans }}</div>");
+              },
+              success: function(response) {
+                // refresh the table
+                $("#childrenList").html(response);
+                // refresh the calendar
+                //$("#calendar").load("{{ path('show_meal_order',{'month': date|date('m'), 'year': date|date('Y') }) }}");
+                $("#{{ date|date('j') }} span:last-child").load("{{ path('refresh_day_meal_order',{'day': date|date('d'), 'month': date|date('m'), 'year': date|date('Y') }) }}")
+              },
+              error: function(response, error) {
+
+              },
+              complete: function() {
+                $(this).css('cursor', 'pointer');
+                $("#alertBox").load('{{ path('flash') }}');
+              }
+            });
+          }
+          return false;
+        });
+
+      });
+    </script>
+    <script>
+          {% autoescape 'js' %}
+      $(document).ready(function() {
+        $("#children_list").select2({'placeholder': "{{ 'Ajouter'|trans }}"});
+        $("select#children_list").change(function() {
+          var childid = $("#children_list option:selected").val();
+          var childname = $("#children_list option:selected").text();
+          var tabId = $("#children_list option:selected").attr('grade');
+          if (window.confirm("{{ 'cantine.childrendays.child.add.confirm'|trans }} " + childname + "({{ date|date('d/m/Y') }})")) {
+            $.ajax({
+              type: 'GET',
+              url: "{{ path('Calendar_Home') }}childrendays/add_child_day/" + childid + "/{{ date|date('d') }}/{{ date|date('m') }}/{{ date|date('Y') }}/" + tabId,
+              beforeSend: function() {
+                $(this).css('cursor', 'progress');
+                $("#alertBox").html("<div class='alert alert-info'>" + childname + " {{ 'cantine.childrendays.flash.addchild'|trans }}</div>");
+              },
+              success: function(response) {
+                // refresh the table
+                $("#childrenList").html(response);
+                // refresh the calendar
+                //$("#calendar").load("{{ path('show_meal_order',{'month': date|date('m'), 'year': date|date('Y') }) }}");
+                $("#{{ date|date('j') }} span:last-child").load("{{ path('refresh_day_meal_order',{'day': date|date('d'), 'month': date|date('m'), 'year': date|date('Y') }) }}")
+              },
+              error: function(response, error) {
+
+              },
+              complete: function() {
+                $(this).css('cursor', 'pointer');
+                $("#alertBox").load('{{ path('flash') }}');
+              }
+            });
+          }
+        });
+      });
+          {% endautoescape %}
+    </script>
+    </div>
+  </div>
+</div>

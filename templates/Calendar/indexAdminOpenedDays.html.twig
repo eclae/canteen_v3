@@ -1,0 +1,28 @@
+{% extends 'SICantineBundle::layout.html.twig' %}
+
+{% block stylesheets %}
+<link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.min.css" rel="stylesheet" media="screen" />
+<link href="{{ asset('css/jquery-plugin/jquery-ui-timepicker-addon.css') }}" rel="stylesheet" media="screen" />
+ {% block CSS_addon %}
+ {% endblock %}
+{% endblock stylesheets %}
+{% block javascripts %}
+<script src="{{ asset('js/jquery-plugin/jquery-ui-timepicker-addon.js') }}"></script>
+<script src="{{ asset('js/jquery-plugin/jquery-ui-sliderAccess.js') }}"></script>
+ {% block JS_addon %}
+ {% endblock %}
+{% endblock javascripts %}
+
+{% block centerTitle %}
+    <h3>{{ 'cantine.menu.admin.manage_openeddays'|trans }}</h3>
+{% endblock %}
+
+{% block content -%}
+{% block calendar %}
+<div id="calendar" class="row">
+{{ render(controller("SICantineBundle:Calendar:showOpenedDaysCalendar",{ 'month': "now"|date('m'), 'year': "now"|date('Y') })) }}
+  </div>
+{% endblock calendar %}
+    {% endblock content %}
+
+

@@ -1,0 +1,8 @@
+{% set title='cantine.menu.child.calendar' %}
+{% set select_placeholder='cantine.title.child.list' %}
+{% set form_action=path('show_child_list_calendar') %}
+{% set endOfURL='/' ~ "now"|date('m') ~ '/' ~ "now"|date('Y') %}
+
+{% include 'tpl_admin_list.html.twig' %}
+
+

@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %} 
+{% block CSS_addon %}
+ {% endblock %}
+{% endblock stylesheets %}
+
+{% block javascripts %}
+ {% block JS_addon %}
+ {% endblock %}
+{% endblock javascripts %}
+
+{%- block centerTitle -%}
+  <p align="center" style="font-size: x-large"><b>{{ 'cantine.title.childrendays.index'|trans }}</b></hp>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+		
+			<div id="calendar" class="col">
+				{{ render(controller("App\\Controller\\ChildrenDaysController::showMealOrderAction",{ 'month': "now"|date('m'), 'year': "now"|date('Y') })) }}
+  			</div>
+		
+		    	<div class="col" id="childrenList">
+		        	{{ render(controller("App\\Controller\\ChildrenDaysController::indexPresenceAction",{ 'day': "now"|date('d'),'month': "now"|date('m'), 'year': "now"|date('Y'), 'tabId': "1" })) }}
+		    	</div>
+		
+ 	</div>
+</div>
+{% endblock content %}
+ 

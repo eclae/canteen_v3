@@ -1,0 +1,19 @@
+<div class="tabbable tabs-left span7">
+     {% for grade in grades %}
+  <div style="page-break-after: always">
+    <table class="table table-condensed" style="text-align: left; text-valign: top;">
+      <thead><tr><td style="text-align: center"><b>{{grade}} du {{ date|date('d/m/Y') }} - {{ childByGrade[loop.index]|length }} Enfant(s)</b></td></tr></thead>
+      <tbody><tr><td>
+        {% for CH in childByGrade[loop.index] %}
+            <p class="childName">
+              <span class="text {{ badgeByMeal[CH.child.meal.id] }}">{{ CH.child }}</span>
+            </p>
+        {% endfor %}
+
+
+          </td></tr></tbody>
+    </table>
+  </div>
+     {% endfor %}
+
+</div>

@@ -1,0 +1,56 @@
+{#<form id="editForm" action="{{ path('admin_child_update', { 'id': entity.id}) }}" method="post" {{ form_start(edit_form, {'method': 'PUT'}) }}>#}
+  {{ form_start(edit_form)}}
+  }  <input type="hidden" name="_method" value="PUT" />
+    {{ form_widget(edit_form) }}
+  <p>
+    <button type="submit" class="btn btn-primary">{{ 'cantine.action.edit'|trans }}</button>
+  </p>
+</form>
+{% if is_granted("ROLE_ADMIN") %}
+<form id="deleteForm" action="{{ path('admin_child_delete', { 'id': entity.id }) }}" method="post">
+  <input type="hidden" name="_method" value="DELETE" />
+
+{{ form_widget(delete_form) }}
+
+  <button type="submit" class="btn btn-danger">{{ 'cantine.action.delete'|trans }}</button>
+</form>
+   {% endif %}
+<script>
+  $(document).ready(function() {
+    $("#editForm").submit(function(e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: $(this).serialize(),
+        beforeSend: function() {
+          $(this).css('cursor', 'progress');
+          $("#alert").html("<div class='alert alert-info'>{{ 'cantine.calendar.flash.pending'|trans|raw }}</div>");
+        },
+        success: function(response) {
+          $("#content").html(response);
+          //alert('{{ 'cantine.alert.changed'|trans }}');
+        },
+        error: function(response, error) {
+          //alert(error);
+        },
+        complete: function() {
+          $("#alert").load('{{ path('flash') }}');
+          $(this).css('cursor', 'pointer');
+        }
+      });
+      return false;
+    });
+    $("#si_cantinebundle_childtype_comment").tooltip();
+    $("#si_cantinebundle_childtype_users").select2();
+    $("#si_cantinebundle_childtype_principalUser").select2();
+    $("#deleteForm").submit(function(e) {
+      //e.preventDefault();
+      if (window.confirm("{{ 'cantine.child.delete.confirm'|trans({'%childname%': entity}) }}")) {
+          return true;
+      } else {
+          return false;
+      }
+    });
+  });
+  </script>
